@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const gravatar = require('gravatar');
 const bcrypt = require('bcryptjs');
-const { check, validationResult } = require('express-validator/check');
+const jwt = require('jsonwebtoken');
+const config = require('config');
+const { check, validationResult } = require('express-validator');
 const User = require('../../models/User');
 
 /* 
@@ -31,7 +33,7 @@ router.post(
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      //return bad status if error
+      // return bad status if error
       return res.status(400).json({ errors: errors.array() });
     }
 
@@ -65,15 +67,30 @@ router.post(
       });
 
       // encrypt password with Bcrypt
-      // use salt to hash  the password with 10 rounds
+      // use salt to hash the password with 10 rounds
       const salt = await bcrypt.genSalt(10);
       user.password = await bcrypt.hash(password, salt);
 
       // actually save the user to the db
       await user.save();
 
-      // TODO: Return jwt
-      res.send('User Registered');
+      // now that the user is registered
+      // return jwt to automatically login the user after signup
+      const payload = {
+        user: {
+          id: user.id
+        }
+      };
+
+      jwt.sign(
+        payload,
+        config.get('jwtSecret'),
+        { expiresIn: 360000 },
+        (err, token) => {
+          if (err) throw err;
+          res.json({ token });
+        }
+      );
     } catch (error) {
       console.error(error.message);
       res.status(500).send('Server error');
