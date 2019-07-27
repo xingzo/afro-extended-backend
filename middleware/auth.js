@@ -1,5 +1,7 @@
 /* 
-  * * * * * MIDDLEWARE TO SEND THE JWT BACK TO THE FRONTEND * * * * *
+ MIDDLEWARE TO PROTECT OUR AUTHENTICATED ROUTES
+ SEND THE JWT BACK TO THE FRONTEND 
+ * * * * * * * * * * 
 
 */
 
@@ -7,15 +9,15 @@ const jwt = require('jsonwebtoken');
 const config = require('config');
 
 module.exports = function(req, res, next) {
-  // Get token from header
+  // get token from header
   const token = req.header('x-auth-token');
 
-  // Check if not token
+  // check if not token
   if (!token) {
+    // if route is protected and there is no token, return no token
     return res.status(401).json({ msg: 'No token, authorization denied' });
   }
-
-  // Verify token
+  // verify token
   try {
     const decoded = jwt.verify(token, config.get('jwtSecret'));
 
