@@ -14,6 +14,12 @@ const ProfileSchema = new mongoose.Schema({
   country: {
     type: String
   },
+  state: {
+    type: String
+  },
+  city: {
+    type: String
+  },
   status: {
     type: String,
     required: true

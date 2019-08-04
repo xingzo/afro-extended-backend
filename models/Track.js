@@ -17,7 +17,7 @@ const TrackSchema = new mongoose.Schema({
     {
       song: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'songs'
+        ref: 'song'
       }
     }
   ],
